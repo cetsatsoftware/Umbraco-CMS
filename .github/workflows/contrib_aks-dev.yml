@@ -32,20 +32,25 @@ jobs:
 
       - name: Verify package.json file existence
         run: |
-          if (!(Test-Path -Path "src/Umbraco.Cms.StaticAssets/package.json")) {
-            Write-Error "package.json not found in src/Umbraco.Cms.StaticAssets. Ensure the correct path or commit the file to the repository."
+          if (!(Test-Path -Path "tests/Umbraco.Tests.AcceptanceTest/package.json")) {
+            Write-Error "package.json not found in tests/Umbraco.Tests.AcceptanceTest. Ensure the correct path or commit the file to the repository."
             exit 1
           }
 
       - name: Install Node.js dependencies
         run: |
-          cd src/Umbraco.Cms.StaticAssets
+          cd tests/Umbraco.Tests.AcceptanceTest
           if (Test-Path -Path "package-lock.json") {
             Write-Host "package-lock.json found, running npm ci..."
             npm ci --no-fund --no-audit --prefer-offline
           } else {
             Write-Host "package-lock.json not found, running npm install to generate it..."
             npm install
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add package-lock.json
+            git commit -m "Add package-lock.json"
+            git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
         shell: pwsh
 
       - name: Build with dotnet
