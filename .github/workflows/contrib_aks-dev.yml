@@ -63,4 +63,8 @@ jobs:
           app-name: 'aks-dev'
           slot-name: 'Production'
           package: .
-          
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
