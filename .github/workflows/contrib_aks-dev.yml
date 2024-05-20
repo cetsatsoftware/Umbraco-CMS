@@ -30,6 +30,13 @@ jobs:
           dotnet-version: '8.x'
           include-prerelease: true
 
+      - name: Verify package.json file existence
+        run: |
+          if (!(Test-Path -Path "src/Umbraco.Cms.StaticAssets/package.json")) {
+            Write-Error "package.json not found in src/Umbraco.Cms.StaticAssets. Ensure the correct path or commit the file to the repository."
+            exit 1
+          }
+
       - name: Install Node.js dependencies
         run: |
           cd src/Umbraco.Cms.StaticAssets
@@ -39,7 +46,6 @@ jobs:
           } else {
             Write-Host "package-lock.json not found, running npm install to generate it..."
             npm install
-          }
         shell: pwsh
 
       - name: Build with dotnet
