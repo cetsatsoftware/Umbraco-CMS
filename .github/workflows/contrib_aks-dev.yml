@@ -32,12 +32,14 @@ jobs:
 
       - name: Install Node.js dependencies
         run: |
-          if [ ! -f src/Umbraco.Cms.StaticAssets/package-lock.json ]; then
-            echo "package-lock.json not found, running npm install to generate it..."
-            npm install --prefix src/Umbraco.Cms.StaticAssets
-          else
+          if (Test-Path -Path "src/Umbraco.Cms.StaticAssets/package-lock.json") {
+            Write-Host "package-lock.json found, running npm ci..."
             npm ci --no-fund --no-audit --prefer-offline --prefix src/Umbraco.Cms.StaticAssets
-          fi
+          } else {
+            Write-Host "package-lock.json not found, running npm install to generate it..."
+            npm install --prefix src/Umbraco.Cms.StaticAssets
+          }
+        shell: pwsh
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
