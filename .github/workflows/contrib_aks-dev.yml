@@ -20,19 +20,24 @@ jobs:
           fetch-depth: 0  # Fetch all history for all branches and tags
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16.x'  # Use the version required by your project
+          node-version: '20.x'  # Use the latest Node.js version
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.x'
           include-prerelease: true
 
       - name: Install Node.js dependencies
-        run: npm ci --no-fund --no-audit --prefer-offline
-        working-directory: src/Umbraco.Cms.StaticAssets
+        run: |
+          if [ ! -f src/Umbraco.Cms.StaticAssets/package-lock.json ]; then
+            echo "package-lock.json not found, running npm install to generate it..."
+            npm install --prefix src/Umbraco.Cms.StaticAssets
+          else
+            npm ci --no-fund --no-audit --prefer-offline --prefix src/Umbraco.Cms.StaticAssets
+          fi
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
